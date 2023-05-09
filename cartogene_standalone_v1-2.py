@@ -3,7 +3,7 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 05/02/2023                     #
+# Last Visit: 05/09/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
@@ -11,6 +11,7 @@
 
 ###USER DEFINED VARIABLES###
 #TODO: Move these to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
+
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens
 #Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
