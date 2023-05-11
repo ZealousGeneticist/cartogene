@@ -11,12 +11,13 @@
 # License: GPL v3.0                          #
 ##############################################
 
-###USER DEFINED VARIABLES###
-#TO DO In Order of Importance:
+#Next TO DO In Order of Importance:
 
 #Move below Input and Output Files to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
 #Make an additional function to take common names for chemicals or products and make a list of bioactive chemical ID's, and determine what ID it would be. (CAS-RN, etc.)
 #Make CASRN renamed to ChemicalName for outfile3
+
+###USER DEFINED VARIABLES###
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens
 #Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
