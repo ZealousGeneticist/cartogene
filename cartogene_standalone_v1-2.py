@@ -1,17 +1,23 @@
+#!/usr/bin/env python3
+
 ##############################################
 #  Cartogene:                                #
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 05/09/2023                     #
+# Last Visit: 05/11/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
 ##############################################
 
-###USER DEFINED VARIABLES###
-#TODO: Move these to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
+#Next TO DO In Order of Importance:
 
+#Move below Input and Output Files to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
+#Make an additional function to take common names for chemicals or products and make a list of bioactive chemical ID's, and determine what ID it would be. (CAS-RN, etc.)
+#Make CASRN renamed to ChemicalName for outfile3
+
+###USER DEFINED VARIABLES###
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens
 #Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
@@ -85,7 +91,8 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
     #Search for interactions with findInteractionWithFacet on IntAct Advanced Search with gss
     url_facet = 'https://www.ebi.ac.uk/intact/ws/interaction/findInteractionWithFacet?'
     #The Parameters
-    pm = {"advancedSearch" : True, "intraSpeciesFilter":True, "page": 1, "pageSize": 1, "query":"taxidA:9606 taxidB:9606" + gss}
+    query = "taxidA:(9606) AND taxidB:(9606) AND geneName:(" + gss + ")"
+    pm = {"advancedSearch" : True, "intraSpeciesFilter":True, "page": 0, "pageSize": 1, "query":query}
     post = requests.post(url_facet,params=pm)
     i = 0
     totalele= post.json()['data']['totalElements']
@@ -125,14 +132,14 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
         if debug:
             print('The # of pages is',filenum)
         while i < filenum:
-            i += 1
             pm['page'] = i
             outfile2 = outjson + str(i) + '.json'
             print('Saving...')
             with open(outfile2, 'wb') as f:
                 for chunk in requests.post(url_facet,params=pm).iter_content(chunk_size=4096):
                     f.write(chunk)
-            print('File',i,'saved.\n')
+            print('File',i+1,'saved.\n')
+            i += 1
             time.sleep(1)
     #Exiting Messages
     print('Omniscience complete. \n',i,'file(s) have been blessed upon you.')
@@ -164,8 +171,8 @@ def reductionism(outfile1, outjson, outfile3, outputHeader=True, organism=9606):
     #Select for only human data(assuming human); haa stands for "I'm only Human, After All" (its a meme)
     haa = of1df[of1df["OrganismID"] == organism]
     ##select for 4th column values, the CASRN, and save as a list & string
-    CasRN = haa[["CasRN","GeneSymbol"]].drop_duplicates(keep='first')
-    for x in CasRN.CasRN.to_list():
+    CasRN = haa[["ChemicalName","GeneSymbol"]].drop_duplicates(keep='first')
+    for x in CasRN.ChemicalName.to_list():
         nodesSource.append(x)
     for x in CasRN.GeneSymbol.to_list():
         nodesTarget.append(x)
