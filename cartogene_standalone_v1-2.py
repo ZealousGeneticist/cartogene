@@ -5,7 +5,7 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 05/11/2023                     #
+# Last Visit: 05/17/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
@@ -15,7 +15,7 @@
 
 #Move below Input and Output Files to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
 #Make an additional function to take common names for chemicals or products and make a list of bioactive chemical ID's, and determine what ID it would be. (CAS-RN, etc.)
-#Make CASRN renamed to ChemicalName for outfile3
+#Make CASRN renamed to ChemicalName for outfile3 DONE
 
 ###USER DEFINED VARIABLES###
 
@@ -25,7 +25,7 @@ import requests, sys, json, time, math, os
 import pandas as pd
 #Define Input and Output Files
 infile = 'bioactive.tsv'
-outfile1 = 'interactionsCTD.tsv'
+outfile1 = 'interactionsCTD'
 outjson = 'faceted_intact_results'
 outfile3 = 'faceted_inact_node_network.tsv'
 #Define Taxonomy ID
@@ -33,7 +33,8 @@ organism=9606
 
 test = False #Omniscience function toggle for single file output
 debug = False #Debugging toggle for verbose output
-
+removeJSON = True #Toggle for deleting orginal IntAct JSON file
+outputHeader = True #Toggle for having headers in the final node library
 ###USER DEFINED FUNCTIONS###
 
 #Define the Program to easily request data from chems and other types of data
@@ -44,7 +45,7 @@ def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
     url = 'http://ctdbase.org/tools/batchQuery.go?report=cgixns&format=tsv&inputTerms='
     get = requests.get(url+inTerms+'&'+'inputType='+inputType+'&'+'actionTypes='+actionTypes)
     #Save interaction data in outfile1
-    with open(outfile1, 'wb') as b:
+    with open(outfile1+'_chemical-protein.tsv', 'wb') as b:
         b.write(get.content)
     #Set debug=True if making/editing code
     if debug:
@@ -65,7 +66,7 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
     #Don't need to make them connect yet with chemicals.
 
     ##Turn outfile1 into a dataframe with pandas
-    of1df = pd.read_table(outfile1) #outfile1 dataframe code
+    of1df = pd.read_table(outfile1+'_chemical-protein.tsv') #outfile1 dataframe code
     #Select for only human data (assuming human); haa stands for "I'm only Human, After All" (its a meme)
     haa = of1df[of1df["OrganismID"] == 9606]
     #debug
@@ -133,7 +134,7 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
             print('The # of pages is',filenum)
         while i < filenum:
             pm['page'] = i
-            outfile2 = outjson + str(i) + '.json'
+            outfile2 = outjson +'_'+ str(i) + '_PPI.json'
             print('Saving...')
             with open(outfile2, 'wb') as f:
                 for chunk in requests.post(url_facet,params=pm).iter_content(chunk_size=4096):
@@ -148,56 +149,78 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
 
 
 ####Make an edge network of source nodes and target nodes (whether chemical or gene)
-def reductionism(outfile1, outjson, outfile3, outputHeader=True, organism=9606):
-    nodesSource = []
-    nodesTarget = []
-    print('Oh yeah, reductionism time...\n its all about to be SourceNode or TargetNode up in here... \n Please wait...')
-    ###Pull out from content moleculeA & moleculeB
-    def nodepull(b,y=[],z=[]):
-        for x in json.load(b)['data']['content']:
-            y.append(x['moleculeA'])
-            z.append(x['moleculeB'])
+def reductionism(outfile1, outjson, outfile3, outputHeader=True, organism=9606, debug = False):
+    print('Oh yeah, reductionism time...\n Making NodeA, NodeB, and EdgeLabel... \n Please wait...')
+    ###Pull out from content moleculeA, moleculeB and add an edgeLabel for PPI
+    def nodepull(b,x=[],y=[]):
+        for a in json.load(b)['data']['content']:
+            x.append(a['moleculeA'])
+            y.append(a['moleculeB'])
+
+    #Define function to sort by row then by column alphanumerically to remove duplicate edges (a-b == b-a)
+    def dupeRemove(nodeA,nodeB,edgeLabel = ''):
+        #Put Node list into a dataframe
+        nodes = {'nodeA':nodeA,
+                'nodeB':nodeB}
+        nodedf = pd.DataFrame(nodes)
+        ##Sort by row then by column alphanumerically to remove duplicate edges (a-b == b-a)
+        nodesort = nodedf.values
+        nodesort.sort(axis=1)
+        nodedf = pd.DataFrame(nodesort, nodedf.index, nodedf.columns)
+        nodedf = nodedf.sort_values(by='nodeA')
+        nodedf = nodedf.drop_duplicates(keep='first')
+        #For applying edgeLabel to each set of nodes
+        edgeList = [] 
+        for x in nodeA:
+                edgeList.append(edgeLabel)
+        nodedf['edgeType'] = edgeLabel
+        return nodedf
 
     #Pull up every outjson file and use for edge table
+    nodesSource = []
+    nodesTarget = []
     with os.scandir() as directory:
         for item in directory:
-            if item.name.startswith(outjson) and item.name.endswith('.json') and item.is_file():
+            if item.name.startswith(outjson) and item.name.endswith('_PPI.json') and item.is_file():
                 with open(item,'rb') as b:
                     nodepull(b,nodesSource,nodesTarget) #NOTE, should replace later because opening each json is bad
                     print(item.name, 'is done being reduced!')
-
-    ##Put edge list for input chemicals in
-    of1df = pd.read_table(outfile1) #outfile1 dataframe code
+    
+    ##Put edge table for input chemicals in
+    node1 = []
+    node2 = []
+    of1df = pd.read_table(outfile1+'_chemical-protein.tsv') #outfile1 dataframe code
     #Select for only human data(assuming human); haa stands for "I'm only Human, After All" (its a meme)
     haa = of1df[of1df["OrganismID"] == organism]
-    ##select for 4th column values, the CASRN, and save as a list & string
-    CasRN = haa[["ChemicalName","GeneSymbol"]].drop_duplicates(keep='first')
-    for x in CasRN.ChemicalName.to_list():
-        nodesSource.append(x)
-    for x in CasRN.GeneSymbol.to_list():
-        nodesTarget.append(x)
+    ##select for 4th column values, the chemicalName, and save as a list & string
+    chemicalName = haa[["ChemicalName","GeneSymbol"]].drop_duplicates(keep='first')
+    for a in chemicalName.ChemicalName.to_list():
+        node1.append(a)
+    for a in chemicalName.GeneSymbol.to_list():
+        node2.append(a)
 
     #Put Node list into node library
-    nodes = {'SourceNode':nodesSource,
-             'TargetNode':nodesTarget}
-    nodedf = pd.DataFrame(nodes)
-    ##Sort by row then by column alphanumerically to remove duplicate edges (a-b == b-a)
-    nodesort = nodedf.values
-    nodesort.sort(axis=1)
-    nodedf = pd.DataFrame(nodesort, nodedf.index, nodedf.columns)
-    nodedf = nodedf.sort_values(by='SourceNode')
-    nodedf = nodedf.drop_duplicates(keep='first')
+    x = dupeRemove(nodesSource,nodesTarget,'PPI')
+    y = dupeRemove(node1,node2,'chemical-protein')
+    finaldf = pd.concat([x,y],ignore_index=True) #Joining the dataFrames together
     #debug
     if debug:
-        print(*nodes, sep='\t')
-        print(nodedf)
+        print(finaldf)
 
     #Comes down to a 2 column dataframe in outfile3, input for outputHeader
-    nodedf.to_csv(outfile3, index=False, sep='\t', header= outputHeader)
+    finaldf.to_csv(outfile3, index=False, sep='\t', header= outputHeader)
     print('Reduced to atoms... or at least: \n',os.stat(outfile3).st_size/1000, 'kB')
 
+#Function for deleting huge JSON files from omniscience as cleanup
+def cleanup(removeJSON):
+    if removeJSON == True:
+        with os.scandir() as directory:
+            for item in directory:
+                if item.name.startswith(outjson) and item.name.endswith('_PPI.json') and item.is_file():
+                    os.remove(item)
 
 ### PROGRAM ###
 cgixns(infile, outfile1 ,actionTypes='binding')
 omniscience(outfile1, outjson)
-reductionism(outfile1,outjson,outfile3)
+reductionism(outfile1,outjson,outfile3,outputHeader)
+cleanup(removeJSON)
