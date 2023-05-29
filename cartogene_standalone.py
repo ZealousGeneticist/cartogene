@@ -83,7 +83,7 @@ args = parser.parse_args()
 
 #Define Input and Output Files
 infile = args.input
-outfile3 = args.output-
+outfile3 = args.output
 outfile1 = args.ctd
 outjson = args.json
 #Define Taxonomy ID
