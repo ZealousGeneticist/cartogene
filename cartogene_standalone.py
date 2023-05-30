@@ -5,37 +5,92 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 05/17/2023                     #
+# Last Visit: 05/30/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
 ##############################################
 
-#Next TO DO In Order of Importance:
+#Package Installation
+import subprocess
+import sys
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-#Move below Input and Output Files to command line options:  https://www.knowledgehut.com/blog/programming/sys-argv-python-examples
-#Make an additional function to take common names for chemicals or products and make a list of bioactive chemical ID's, and determine what ID it would be. (CAS-RN, etc.)
-#Make CASRN renamed to ChemicalName for outfile3 DONE
+import requests, json, time, math, os, argparse
+install("pandas")
+import pandas as pd
 
 ###USER DEFINED VARIABLES###
+##################################
+parser = argparse.ArgumentParser()
+
+#infile, Input Chemical List
+parser.add_argument("-i", "--input", required=True,
+                    help="input file name of chemical list")
+
+#outfile3, Edge List Name
+parser.add_argument("-o", "--output", required=False,
+                    nargs='?', default="faceted_inact_node_network.tsv", const="faceted_inact_node_network.tsv",
+                    help="ouput edge list file name\ndefault='faceted_inact_node_network.tsv'")
+
+#outfile1, CTD Chemical-Gene Interaction Table Name
+parser.add_argument("-c", "--ctd", required=False,
+                    nargs='?', default="interactionsCTD", const="interactionsCTD",
+                    help="CTD chemical-gene interaction file name\ndefault='interactionsCTD'")
+
+#outjson, IntAct (Large) Data File Name
+parser.add_argument("-j", "--json", required=False,
+                    nargs='?', default="faceted_intact_results", const="faceted_intact_results",
+                    help="large orginal IntAct data file name\ndefault='faceted_intact_results'")
+
+#organismID, NCBI Taxonomy Number
+parser.add_argument("-g", "--organism", required=False,
+                    nargs='?', default=9606, const=9606, 
+                    type=int,
+                    help="organism NCBI Taxonomy ID number\ndefault=9606")
+
+#test, Omniscience Specific Single-Data-File Tester
+parser.add_argument("-t", "--test", required=False,
+                    nargs='?', default=False, const=False,
+                    type=bool,
+                    help="Used to output only one IntAct JSON to test computing problems\ndefault=False")
+
+#debug
+parser.add_argument("-d", "--debug", required=False,
+                    nargs='?', default=False, const=False,
+                    type=bool,
+                    help="debug mode\ndefault=False")
+
+#removeJSON, Deletes orginal data JSON in cleanup
+parser.add_argument("-r", "--removejson", required=False,
+                    nargs='?', default=True, const=True,
+                    type=bool,
+                    help="cleanup option, set to False to disable\ndefault=True")
+
+#outputHeader, Edge List (outfile3) Header Enable/Disable
+parser.add_argument("-e", "--header", required=False,
+                    nargs='?', default=True, const=True,
+                    type=bool,
+                    help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=True")
+
+args = parser.parse_args()
+##################################
+
+#Define Input and Output Files
+infile = args.input
+outfile3 = args.output
+outfile1 = args.ctd
+outjson = args.json
+organism= args.organism #Define Taxonomy ID
+test = args.test #Omniscience function toggle for single file output
+debug = args.debug #Debugging toggle for verbose output
+removeJSON = args.removejson #Toggle for deleting orginal IntAct JSON file
+outputHeader = args.header #Toggle for having headers in the final node library
+###USER DEFINED FUNCTIONS###
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens
 #Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
-import requests, sys, json, time, math, os
-import pandas as pd
-#Define Input and Output Files
-infile = 'bioactive.tsv'
-outfile1 = 'interactionsCTD'
-outjson = 'faceted_intact_results'
-outfile3 = 'faceted_inact_node_network.tsv'
-#Define Taxonomy ID
-organism=9606
-
-test = False #Omniscience function toggle for single file output
-debug = False #Debugging toggle for verbose output
-removeJSON = True #Toggle for deleting orginal IntAct JSON file
-outputHeader = True #Toggle for having headers in the final node library
-###USER DEFINED FUNCTIONS###
 
 #Define the Program to easily request data from chems and other types of data
 def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
