@@ -11,7 +11,14 @@
 # License: GPL v3.0                          #
 ##############################################
 
-import requests, sys, json, time, math, os, argparse
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+import requests, json, time, math, os, argparse
+install("pandas")
 import pandas as pd
 
 #Next TO DO In Order of Importance:
@@ -72,10 +79,10 @@ parser.add_argument("-r", "--removejson", required=False,
                     help="cleanup option, set to False to disable\ndefault=True")
 
 #outputHeader, Edge List (outfile3) Header Enable/Disable
-parser.add_argument("-h", "--header", required=False,
+parser.add_argument("-e", "--header", required=False,
                     nargs='?', default=True, const=True,
                     type=bool,
-                    help="header option for the final edge list\ndeafult=True")
+                    help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=True")
 
 args = parser.parse_args()
 
