@@ -5,15 +5,15 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 05/27/2023                     #
+# Last Visit: 05/30/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
 ##############################################
 
+#Package Installation
 import subprocess
 import sys
-
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
@@ -21,18 +21,8 @@ import requests, json, time, math, os, argparse
 install("pandas")
 import pandas as pd
 
-#Next TO DO In Order of Importance:
-
-#Make an additional function to take common names for chemicals or products and make a list of bioactive chemical ID's, and determine what ID it would be. (CAS-RN, etc.)
-#Make documentation for how to utilize this program for someone who knows nothing about programming.
-
 ###USER DEFINED VARIABLES###
-
-##Take data of bioactive compounds and ask for what they interact with in homo sapiens
-#Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
-
 ##################################
-
 parser = argparse.ArgumentParser()
 
 #infile, Input Chemical List
@@ -85,7 +75,6 @@ parser.add_argument("-e", "--header", required=False,
                     help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=True")
 
 args = parser.parse_args()
-
 ##################################
 
 #Define Input and Output Files
@@ -93,14 +82,15 @@ infile = args.input
 outfile3 = args.output
 outfile1 = args.ctd
 outjson = args.json
-#Define Taxonomy ID
-organism= args.organism
-
+organism= args.organism #Define Taxonomy ID
 test = args.test #Omniscience function toggle for single file output
 debug = args.debug #Debugging toggle for verbose output
 removeJSON = args.removejson #Toggle for deleting orginal IntAct JSON file
 outputHeader = args.header #Toggle for having headers in the final node library
 ###USER DEFINED FUNCTIONS###
+
+##Take data of bioactive compounds and ask for what they interact with in homo sapiens
+#Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
 
 #Define the Program to easily request data from chems and other types of data
 def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
