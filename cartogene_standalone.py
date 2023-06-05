@@ -17,9 +17,12 @@ import sys
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+install("requests")
 import requests, json, time, math, os, argparse
 install("pandas")
 import pandas as pd
+install("str2bool")
+from str2bool import str2bool
 
 ###USER DEFINED VARIABLES###
 ##################################
@@ -53,25 +56,21 @@ parser.add_argument("-g", "--organism", required=False,
 #test, Omniscience Specific Single-Data-File Tester
 parser.add_argument("-t", "--test", required=False,
                     nargs='?', default=False, const=False,
-                    type=bool,
                     help="Used to output only one IntAct JSON to test computing problems\ndefault=False")
 
 #debug
 parser.add_argument("-d", "--debug", required=False,
                     nargs='?', default=False, const=False,
-                    type=bool,
                     help="debug mode\ndefault=False")
 
 #removeJSON, Deletes orginal data JSON in cleanup
 parser.add_argument("-r", "--removejson", required=False,
                     nargs='?', default=True, const=True,
-                    type=bool,
                     help="cleanup option, set to False to disable\ndefault=True")
 
 #outputHeader, Edge List (outfile3) Header Enable/Disable
 parser.add_argument("-e", "--header", required=False,
                     nargs='?', default=True, const=True,
-                    type=bool,
                     help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=True")
 
 args = parser.parse_args()
@@ -83,17 +82,18 @@ outfile3 = args.output
 outfile1 = args.ctd
 outjson = args.json
 organism= args.organism #Define Taxonomy ID
-test = args.test #Omniscience function toggle for single file output
-debug = args.debug #Debugging toggle for verbose output
-removeJSON = args.removejson #Toggle for deleting orginal IntAct JSON file
-outputHeader = args.header #Toggle for having headers in the final node library
+test = str2bool(str(args.test)) #Omniscience function toggle for single file output
+debug = str2bool(str(args.debug)) #Debugging toggle for verbose output
+removeJSON = str2bool(str(args.removejson)) #Toggle for deleting orginal IntAct JSON file
+outputHeader = str2bool(str(args.header)) #Toggle for having headers in the final node library
 ###USER DEFINED FUNCTIONS###
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens
 #Retrieve data via CTD's batch Querry Tool, send an HTTP GET request to http://ctdbase.org/tools/batchQuery.go
 
-#Define the Program to easily request data from chems and other types of data
+#Define the program to easily request data from chems and other types of data
 def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
+    print('Begining Comparative Toxicogenomics Database (CTD) chemical-gene interaction Batch Query...')
     with open(infile, 'r') as lines:
         inTerms = lines.read()
     #CTD URL Batch Querry with input
@@ -109,21 +109,19 @@ def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
         print(f"{get.status_code}: {get.reason}")
         with open(infile, 'rb') as lines:
             print(lines.read())
-    return print("Done! Have a great rest of your research, dude! :)")
+    return print("Done! Have a great rest of your research, dude! :)\n")
 
 
 #Define program to grab all interaction data from IntAct on all genes in CTD Data from cgixns as omniscience
 def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, debug=False):
-    if organism != 9606:
-        print('Sorry, currently only humans supported! Come back soon.')
-        return
+    print('Beginning to grab all interaction data from IntAct on all genes in CTD datatable...')
     ###Define function to take outfile1 dataframe and get all interactions between genes
     #Don't need to make them connect yet with chemicals.
 
     ##Turn outfile1 into a dataframe with pandas
     of1df = pd.read_table(outfile1+'_chemical-protein.tsv') #outfile1 dataframe code
     #Select for only human data (assuming human); haa stands for "I'm only Human, After All" (its a meme)
-    haa = of1df[of1df["OrganismID"] == 9606]
+    haa = of1df[of1df["OrganismID"] == organism]
     #debug
     if debug:
         print(of1df.head(3))
@@ -147,7 +145,8 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
     #Search for interactions with findInteractionWithFacet on IntAct Advanced Search with gss
     url_facet = 'https://www.ebi.ac.uk/intact/ws/interaction/findInteractionWithFacet?'
     #The Parameters
-    query = "taxidA:(9606) AND taxidB:(9606) AND geneName:(" + gss + ")"
+    query = f"taxidA:({organism}) AND taxidB:({organism}) AND geneName:({gss}) AND ((ptypeA:protein) AND (ptypeB:protein))"
+    # (((ptypeA:protein) OR (ptypeA:gene)) AND ((ptypeB:protein) OR (ptypeB:gene)))
     pm = {"advancedSearch" : True, "intraSpeciesFilter":True, "page": 0, "pageSize": 1, "query":query}
     post = requests.post(url_facet,params=pm)
     i = 0
@@ -199,13 +198,12 @@ def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, d
             time.sleep(1)
     #Exiting Messages
     print('Omniscience complete. \n',i,'file(s) have been blessed upon you.')
-    print('Please consider using reductionism (the program) on your data so it is inteligible.')
-    print('The sciences shall voyage far from our island of ignorance into the midst of black seas of infinity.')
+    print('The sciences shall voyage far from our island of ignorance into the midst of black seas of infinity.\n')
 
 
 ####Make an edge network of source nodes and target nodes (whether chemical or gene)
 def reductionism(outfile1, outjson, outfile3, outputHeader=True, organism=9606, debug = False):
-    print('Oh yeah, reductionism time...\n Making NodeA, NodeB, and EdgeLabel... \n Please wait...')
+    print('Oh yeah, reductionism time...\n Please wait...')
     ###Pull out from content moleculeA, moleculeB and add an edgeLabel for PPI
     def nodepull(b,x=[],y=[]):
         for a in json.load(b)['data']['content']:
@@ -268,13 +266,14 @@ def reductionism(outfile1, outjson, outfile3, outputHeader=True, organism=9606, 
 
 #Function for deleting huge JSON files from omniscience as cleanup
 def cleanup(removeJSON):
-    if removeJSON == True:
+    if removeJSON:
         with os.scandir() as directory:
             for item in directory:
                 if item.name.startswith(outjson) and item.name.endswith('_PPI.json') and item.is_file():
                     os.remove(item)
 
 ### PROGRAM ###
+print('\n\n\n')
 cgixns(infile, outfile1 ,actionTypes='binding')
 omniscience(outfile1, outjson)
 reductionism(outfile1,outjson,outfile3,outputHeader)
