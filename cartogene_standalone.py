@@ -5,7 +5,7 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 06/20/2023                     #
+# Last Visit: 10/25/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
@@ -70,8 +70,8 @@ parser.add_argument("-r", "--removejson", required=False,
 
 #outputHeader, Edge List (outfile3) Header Enable/Disable
 parser.add_argument("-e", "--header", required=False,
-                    nargs='?', default=True, const=True,
-                    help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=True")
+                    nargs='?', default=False, const=False,
+                    help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=False")
 
 args = parser.parse_args()
 ##################################
@@ -109,7 +109,7 @@ def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
         print(f"{get.status_code}: {get.reason}")
         with open(infile, 'rb') as lines:
             print(lines.read())
-    return print("Done! Have a great rest of your research, dude! :)\n")
+    return print("Done with chemical to gene interactions! Have a great rest of your research, dude! :)\n")
 
 
 #Define program to grab all interaction data from IntAct on all genes in CTD Data from cgixns as omniscience
