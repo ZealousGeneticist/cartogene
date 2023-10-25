@@ -1,11 +1,11 @@
 # cartogene
-An Python program for taking chemicals and finding the genes they interact with and the mechanisms of interaction.
+A Python program for taking chemicals and finding the genes they interact with and the mechanisms of interaction.
 
 # Installation Instructions
 git clone https://github.com/ZealousGeneticist/cartogene.git
 
 ## User Guide
-Put the chemicals you want to analyze in the input text file (tutorial example: <bioactive.tsv>) as a MeSH® name, synonym, or accession ID (“MESH:…”), or by CAS RN. You may also limit your search to official names by using the “name:” prefix. *Make sure they are return- or |-delimited!*
+Put the chemicals you are wanting to analyze in the input text file (tutorial example: <bioactive.tsv>) as a MeSH® name, synonym, or accession ID (“MESH:…”), or by CAS RN. You may also limit your search to official names by using the “name:” prefix. *Make sure they are return- or |-delimited!*
     + The tutorial text file <bioactive.tsv> has been given to show multiple examples for how chemicals can be written. However, if you are unsure as to if your chemical is not showing up, check the Comparative Toxicogenomic Database to make sure it is there!
 
 Then you can run the program on the chemicals by running this command in the terminal (given you have python3 installed and pip installed):
@@ -15,7 +15,7 @@ python3 cartogene_standalone.py -i <your_chem_file>
 Your final list should be in another text file called <faceted_inact_node_network.tsv>, unless you wish to name it something else, in which case you simply add -o <my_output> to the above command and it will come out as <my_output> .
 
 ### Advanced User Guide
-Here is the entire list of optional commands that can be utilized for cartogene: 
+Here are the optional commands that can be utilized for cartogene: 
 + **Input File**
     + "-i", "--input"
     + **ONLY REQUIRED ARGUMENT**
@@ -48,7 +48,7 @@ Here is the entire list of optional commands that can be utilized for cartogene:
     + "-r", "--removejson"
     + *Bool value*
     + *Description*: This bool value is used to turn on or off the cleanup() process in the script which removes the chunky IntAct JSON, as normally the JSON is to large for any convient use on the user's end after it has been used by the program. It is **by default** `True` and **turned on.**
-+ **Edge List Header Enable/Disable**
++ **Edge List Header Toggle**
     + "-e", "--header"
     + *Bool value*
     + *Description*: This bool value is used as a way to control whether you wish for the final output file to have headers for the edge list or to only have the columns be data. It is **by default** `True` and as such **keeps the headers**.
