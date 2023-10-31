@@ -14,8 +14,16 @@
 #Package Installation
 import subprocess
 import sys
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+import pkg_resources
+def install(package): #Installing process for dependencies
+    try:
+        # Check if the package is already installed
+        pkg_resources.get_distribution(package)
+        print(f"{package} is already installed.")
+    except pkg_resources.DistributionNotFound:
+        # If the package is not installed, install it
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+        print(f"{package} has been installed.")
 
 install("requests")
 import requests, json, time, math, os, argparse
