@@ -121,7 +121,7 @@ def cgixns(infile, outfile1, inputType='chem', actionTypes='ANY', debug=False):
 
 
 #Define program to grab all interaction data from IntAct on all genes in CTD Data from cgixns as omniscience
-def omniscience(outfile1, outjson, jsonSize=10_000, organism=9606, test=False, debug=False):
+def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, debug=False):
     print('Beginning to grab all interaction data from IntAct on all genes in CTD datatable...')
     ###Define function to take outfile1 dataframe and get all interactions between genes
     #Don't need to make them connect yet with chemicals.
