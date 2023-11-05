@@ -183,7 +183,6 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
 
     ###Save interactions data json in folder as outfile2
     #Option to only make 1 file, then fake files to see if the procedure works
-    z=0
     if test:
         if debug:
             print('The # of pages is',filenum)
@@ -203,7 +202,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
         if debug:
             print('The # of pages is',filenum)
         while i < filenum:
-            z += 1
+            z=0
             pm['page'] = i
             outfile2 = outjson +'_'+ str(i) + '_PPI.json'
             print('Saving...')
@@ -211,6 +210,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
                 sam_i_hope_your_right = requests.post(url_facet,params=pm) #Sam was right.
                 print('Status: ',sam_i_hope_your_right.status_code) #Get 500'ed, idiot.
                 if sam_i_hope_your_right.status_code == 500:
+                    z += 1
                     print('Internal Server Error. NOT THIS PROGRAM, IntAct is to blame.')
                     print("Retrying to download ", outfile2)
                     if z > 3:
