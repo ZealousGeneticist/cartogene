@@ -35,7 +35,6 @@ Here are the optional commands that can be utilized for cartogene:
     + "-g", "--organism"
     + *Integer value*
     + *Description*: This integer value is the ID for the organism you wish to search by. By default, it uses the one for humans (`9606`).
-        + At this time, only one organism can be specified.
 + **Omniscience Specific Single-Data-File Tester**
     + "-t", "--test"
     + *Bool value*
@@ -51,7 +50,7 @@ Here are the optional commands that can be utilized for cartogene:
 + **Edge List Header Toggle**
     + "-e", "--header"
     + *Bool value*
-    + *Description*: This bool value is used as a way to control whether you wish for the final output file to have headers for the edge list or to only have the columns be data. It is **by default** `True` and as such **keeps the headers**.
+    + *Description*: This bool value is used as a way to control whether you wish for the final output file to have headers for the edge list or to only have the columns be data. It is **by default** `False` and as such **keeps no headers**.
 
 Extra:
 *There should be maxium number of ~4000 chemicals that can be utilized as stated by the CTD Batch Query API.*
