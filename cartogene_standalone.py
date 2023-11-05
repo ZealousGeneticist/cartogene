@@ -156,8 +156,15 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
     query = f"taxidA:({organism}) AND taxidB:({organism}) AND geneName:({gss}) AND ((ptypeA:protein) AND (ptypeB:protein))"
     # (((ptypeA:protein) OR (ptypeA:gene)) AND ((ptypeB:protein) OR (ptypeB:gene)))
     pm = {"advancedSearch" : True, "intraSpeciesFilter":True, "page": 0, "pageSize": 1, "query":query}
-    post = requests.post(url_facet,params=pm)
-    i = 0
+    i = 0    
+    while i == 0:
+        post = requests.post(url_facet,params=pm)
+        if post.status_code == 500:
+            time.sleep(1)
+            print("Server issues, one second...")
+            continue
+        break
+
     totalele= post.json()['data']['totalElements']
     filenum = math.ceil(totalele / jsonSize)
     #Omniscience feedback#
