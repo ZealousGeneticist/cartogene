@@ -202,7 +202,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
             print('Saving...')
             with open(outfile2, 'wb') as f:
                 for chunk in requests.post(url_facet,params=pm).iter_content(chunk_size=4096):
-                    if pattern.match(chunk):
+                    if pattern.match(str(chunk)):
                         print('Oopsie.')
                     f.write(chunk)
             print('File',i+1,'saved.\n')
