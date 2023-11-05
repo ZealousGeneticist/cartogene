@@ -15,6 +15,7 @@
 import subprocess
 import sys
 import pkg_resources
+import re
 def install(package): #Installing process for dependencies
     try:
         # Check if the package is already installed
@@ -176,6 +177,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
 
     ###Save interactions data json in folder as outfile2
     #Option to only make 1 file, then fake files to see if the procedure works
+    pattern = re.compile("error: *500", re.IGNORECASE)
     if test:
         if debug:
             print('The # of pages is',filenum)
@@ -200,6 +202,8 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
             print('Saving...')
             with open(outfile2, 'wb') as f:
                 for chunk in requests.post(url_facet,params=pm).iter_content(chunk_size=4096):
+                    if pattern.match(chunk):
+                        print('Oopsie.')
                     f.write(chunk)
             print('File',i+1,'saved.\n')
             i += 1
