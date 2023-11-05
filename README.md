@@ -6,7 +6,7 @@ git clone https://github.com/ZealousGeneticist/cartogene.git
 
 ## User Guide
 Put the chemicals you are wanting to analyze in the input text file (tutorial example: <bioactive.tsv>) as a MeSH® name, synonym, or accession ID (“MESH:…”), or by CAS RN. You may also limit your search to official names by using the “name:” prefix. *Make sure they are return- or |-delimited!*
-    + The tutorial text file <bioactive.tsv> has been given to show multiple examples for how chemicals can be written. However, if you are unsure as to if your chemical is not showing up, check the Comparative Toxicogenomic Database to make sure it is there!
++ The tutorial text file <bioactive.tsv> has been given to show multiple examples for how chemicals can be written. However, if you are unsure as to if your chemical is not showing up, check the Comparative Toxicogenomic Database to make sure it is there!
 
 Then you can run the program on the chemicals by running this command in the terminal (given you have python3 installed and pip installed):
 
