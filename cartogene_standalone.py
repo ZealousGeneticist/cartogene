@@ -5,7 +5,7 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 11/04/2023                     #
+# Last Visit: 12/18/2023                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
@@ -157,11 +157,16 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
     # (((ptypeA:protein) OR (ptypeA:gene)) AND ((ptypeB:protein) OR (ptypeB:gene)))
     pm = {"advancedSearch" : True, "intraSpeciesFilter":True, "page": 0, "pageSize": 1, "query":query}
     i = 0    
+    p = 0
     while i == 0:
         post = requests.post(url_facet,params=pm)
         if post.status_code == 500:
             time.sleep(1)
             print("Server issues, one second...")
+            p += 1
+            if p > 3:
+                print("Server is having BIG ISSUES. Please try again later.")
+                break
             continue
         break
 
