@@ -160,7 +160,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
     p = 0
     while i == 0:
         post = requests.post(url_facet,params=pm)
-        if post.status_code == 500:
+        if 500 <= post.status_code < 600:
             time.sleep(1)
             print("Server issues, one second...")
             p += 1
@@ -214,7 +214,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
             with open(outfile2, 'wb') as f:
                 sam_i_hope_your_right = requests.post(url_facet,params=pm) #Sam was right.
                 print('Status: ',sam_i_hope_your_right.status_code) #Get 500'ed, idiot.
-                if sam_i_hope_your_right.status_code == 500:
+                if 500 <= sam_i_hope_your_right.status_code < 600:
                     z += 1
                     print('Internal Server Error. NOT THIS PROGRAM, IntAct is to blame.')
                     print("Retrying to download ", outfile2)
