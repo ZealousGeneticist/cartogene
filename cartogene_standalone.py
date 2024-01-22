@@ -5,7 +5,7 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 12/18/2023                     #
+# Last Visit: 01/22/2024                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
@@ -14,22 +14,27 @@
 #Package Installation
 import subprocess
 import sys
-import pkg_resources
-def install(package): #Installing process for dependencies
-    try:
-        # Check if the package is already installed
-        pkg_resources.get_distribution(package)
-        print(f"{package} is already installed.")
-    except pkg_resources.DistributionNotFound:
-        # If the package is not installed, install it
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-        print(f"{package} has been installed.")
+# import pkg_resources
+# def install(package): #Installing process for dependencies
+#     try:
+#         # Check if the package is already installed
+#         pkg_resources.get_distribution(package)
+#         print(f"{package} is already installed.")
+#     except pkg_resources.DistributionNotFound:
+#         # If the package is not installed, install it
+#         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+#         print(f"{package} has been installed.")
 
-install("requests")
+
+#Install Requirements
+subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+
+
+# install("requests")
 import requests, json, time, math, os, argparse
-install("pandas")
+# install("pandas")
 import pandas as pd
-install("str2bool")
+# install("str2bool")
 from str2bool import str2bool
 
 ###USER DEFINED VARIABLES###
@@ -175,7 +180,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
     #Omniscience feedback#
     print('The number of elements in total:',totalele)
     del totalele
-    if ~test:
+    if not test:
         print("The number of files shall be:",filenum)
         print('Omniscience prepped. Beginning to write file: \n',(i+1),"of",filenum)
     else:
@@ -184,7 +189,7 @@ def omniscience(outfile1, outjson, jsonSize=5_000, organism=9606, test=False, de
     pm['pageSize'] = jsonSize
     del post
     #Estimate Time for each file to download from server
-    print('The server will take about',requests.post(url_facet,params=pm).elapsed,'to process each file.\n')
+    print('This may take a little while to process each file. Make sure you stay hydrated!\n')
 
     ###Save interactions data json in folder as outfile2
     #Option to only make 1 file, then fake files to see if the procedure works
