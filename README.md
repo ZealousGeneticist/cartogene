@@ -18,6 +18,21 @@ Your final list should be in another text file called <faceted_inact_node_networ
 
 **python3 cartogene_standalone.py -i <your_chem_file> -z**
 
+------
+
+
+#### Quick Guide on Networks
+    Nodes: Think of nodes as individual points or entities. In a biological network, nodes could be genes or chemicals or proteins or all of the above.
+
+    Edges: Edges represent connections or relationships between nodes. In a biological network, an edge could represent an interaction between genes or proteins or chemicals or any of the above.
+
+    Networks: Networks are a collection of nodes and edges. When you have multiple chemicals/proteins/genes connected through interactions, you have a biological network.
+
+    Communities: Communities are groups of nodes that are more densely connected to each other than to nodes outside the group. In a biological network, a community could be a group of proteins who interact more with each other (say, to make an enzyme) than with proteins outside the group.
+So, nodes are individual data points, edges are connections between them, networks are the overall structure, and communities are tightly-knit groups within that structure.
+
+------
+
 ### Advanced User Guide
 Here are the optional commands that can be utilized for cartogene: 
 + **Input File**
