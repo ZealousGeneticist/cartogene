@@ -5,15 +5,14 @@
 #  Brief description of what this code does  #
 #                                            #
 # First Write: 02/01/2023                    #
-# Last Visit: 01/23/2024                     #
+# Last Visit: 02/01/2024                     #
 #                                            #
 # Luke Mabry <elmabry99@gmail.com>           #
 # License: GPL v3.0                          #
 ##############################################
 
 #Package Installation
-import subprocess
-import sys
+import subprocess, sys, argparse, os
 # import pkg_resources
 # def install(package): #Installing process for dependencies
 #     try:
@@ -26,16 +25,7 @@ import sys
 #         print(f"{package} has been installed.")
 
 
-#Install Requirements
-subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
-
-# install("requests")
-import requests, json, time, math, os, argparse
-# install("pandas")
-import pandas as pd
-# install("str2bool")
-from str2bool import str2bool
 
 ###USER DEFINED VARIABLES###
 ##################################
@@ -68,23 +58,28 @@ parser.add_argument("-g", "--organism", required=False,
 
 #test, Omniscience Specific Single-Data-File Tester
 parser.add_argument("-t", "--test", required=False,
-                    nargs='?', default=False, const=False,
+                    action='store_true', default=False, # on/off flag
                     help="Used to output only one IntAct JSON to test computing problems\ndefault=False")
 
 #debug
 parser.add_argument("-d", "--debug", required=False,
-                    nargs='?', default=False, const=False,
+                    action='store_true', default=False, # on/off flag
                     help="debug mode\ndefault=False")
 
 #removeJSON, Deletes orginal data JSON in cleanup
 parser.add_argument("-r", "--removejson", required=False,
-                    nargs='?', default=True, const=True,
-                    help="cleanup option, set to False to disable\ndefault=True")
+                    action='store_false', default=True, # on/off flag
+                    help="cleanup option, call it to disable\ndefault=True")
 
 #outputHeader, Edge List (outfile3) Header Enable/Disable
 parser.add_argument("-e", "--header", required=False,
-                    nargs='?', default=False, const=False,
+                    action='store_true', default=False, # on/off flag
                     help="header option for the final edge list\ncalled '-e' because '-h' is help\ndeafult=False")
+
+#noinstall, Disables installation of required packages
+parser.add_argument("-z","--noinstall", required=False, 
+                    action='store_true', default=False, # on/off flag
+                    help='disables installation of required packages in requirements.txt\ndefault=False')
 
 args = parser.parse_args()
 ##################################
@@ -95,10 +90,25 @@ outfile3 = args.output
 outfile1 = args.ctd
 outjson = args.json
 organism= args.organism #Define Taxonomy ID
-test = str2bool(str(args.test)) #Omniscience function toggle for single file output
-debug = str2bool(str(args.debug)) #Debugging toggle for verbose output
-removeJSON = str2bool(str(args.removejson)) #Toggle for deleting orginal IntAct JSON file
-outputHeader = str2bool(str(args.header)) #Toggle for having headers in the final node library
+test = args.test #Omniscience function toggle for single file output
+debug = args.debug #Debugging toggle for verbose output
+removeJSON = args.removejson #Toggle for deleting orginal IntAct JSON file
+outputHeader = args.header #Toggle for having headers in the final node library
+noinstall = args.z # Toggle for machines like super computers that don't give permission for the folder holding python to have packages installed by the user
+
+#Package Installation (cont.)
+#Install Requirements.txt
+if not noinstall:
+    subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+else:
+    print("Argument --noinstall was utilized. \nThe program will work only if you have already installed the packages in requirement.txt already manually.")
+
+# install("requests")
+import requests, json, time, math
+# install("pandas")
+import pandas as pd
+
+
 ###USER DEFINED FUNCTIONS###
 
 ##Take data of bioactive compounds and ask for what they interact with in homo sapiens

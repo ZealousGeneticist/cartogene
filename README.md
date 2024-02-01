@@ -14,6 +14,10 @@ python3 cartogene_standalone.py -i <your_chem_file>
 
 Your final list should be in another text file called <faceted_inact_node_network.tsv>, unless you wish to name it something else, in which case you simply add -o <my_output> to the above command and it will come out as <my_output> .
 
+***If you are using a machine like a supercomputer where you do not have permissions to install packages to the python folder which are needed for this program, make sure to run this command after MANUALLY installing the required packages. A fix for this so you don't need to manually do that is coming soon for the less permissioned among your machines.***
+
+**python3 cartogene_standalone.py -i <your_chem_file> -z**
+
 ### Advanced User Guide
 Here are the optional commands that can be utilized for cartogene: 
 + **Input File**
@@ -37,20 +41,19 @@ Here are the optional commands that can be utilized for cartogene:
     + *Description*: This integer value is the ID for the organism you wish to search by. By default, it uses the one for humans (`9606`).
 + **Omniscience Specific Single-Data-File Tester**
     + "-t", "--test"
-    + *Bool value*
-    + *Description*: This bool value is used to output only one IntAct JSON to test computing problems on weaker hardware. By default, it is `False` and doesn't affect anything.
+    + *Description*: This argument is used to output only one IntAct JSON to test computing problems on weaker hardware. By default, it is `False` and doesn't affect anything. Simply calling the argument changes it to `True`.
 + **Debug**
     + "-d", "--debug"
-    + *Bool value*
-    + *Description*: This bool value is used to activate debug mode. This is primary used by the developers to figure out why some code is messing up and where in the script. It is by default `False` and off.
+    + *Description*: This argument is used to activate debug mode. This is primary used by the developers to figure out why some code is messing up and where in the script. It is by default `False` and off. Simply calling the argument changes it to `True`.
 + **Remove Intermediate IntAct Data JSON**
     + "-r", "--removejson"
-    + *Bool value*
-    + *Description*: This bool value is used to turn on or off the cleanup() process in the script which removes the chunky IntAct JSON, as normally the JSON is to large for any convient use on the user's end after it has been used by the program. It is **by default** `True` and **turned on.**
+    + *Description*: This argument is used to turn on or off the cleanup() process in the script which removes the chunky IntAct JSON, as normally the JSON is to large for any convient use on the user's end after it has been used by the program. It is **by default** `True` and **turned on.** Simply calling the argument changes it to `False`.
 + **Edge List Header Toggle**
     + "-e", "--header"
-    + *Bool value*
-    + *Description*: This bool value is used as a way to control whether you wish for the final output file to have headers for the edge list or to only have the columns be data. It is **by default** `False` and as such **keeps no headers**.
+    + *Description*: This argument is used as a way to control whether you wish for the final output file to have headers for the edge list or to only have the columns be data. It is **by default** `False` and as such **keeps no headers**. Simply calling the argument changes it to `True`.
++ **No Installation Toggle**
+    + "-z", "--no install"
+    + *Description*: This argument is used as a way to control whether you wish for the program to install the required packages for you or not. It is **by default** `False` and as such **allows installation**. Simply calling the argument changes it to `True`.
 
 Extra:
 *There should be maxium number of ~4000 chemicals that can be utilized as stated by the CTD Batch Query API.*
