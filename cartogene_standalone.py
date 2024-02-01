@@ -94,7 +94,7 @@ test = args.test #Omniscience function toggle for single file output
 debug = args.debug #Debugging toggle for verbose output
 removeJSON = args.removejson #Toggle for deleting orginal IntAct JSON file
 outputHeader = args.header #Toggle for having headers in the final node library
-noinstall = args.z # Toggle for machines like super computers that don't give permission for the folder holding python to have packages installed by the user
+noinstall = args.noinstall # Toggle for machines like super computers that don't give permission for the folder holding python to have packages installed by the user
 
 #Package Installation (cont.)
 #Install Requirements.txt
